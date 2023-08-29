@@ -2,6 +2,7 @@ package com.example.locationbasics
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val button: Button = findViewById(R.id.btnLocations)
+        button.setBackgroundColor(Color.parseColor("#3FC0C8"))
         tvOutput = findViewById(R.id.lblOutput)
         listView = findViewById(R.id.listView)
 
