@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var locationManager: LocationManager
     private lateinit var tvOutput: TextView
     private lateinit var listView: ListView
+    private val locationHistory = mutableListOf<Locations>()
+
     private val locationList = mutableListOf<String>()
     private lateinit var adapter: ArrayAdapter<String>
     private val locationPermissionCode = 2
@@ -71,15 +73,24 @@ class MainActivity : AppCompatActivity(), LocationListener {
         if (addresses != null && addresses.isNotEmpty()) {
             val address = addresses[0]
             val addressText = address.getAddressLine(0)
-            val latitude = location.latitude
-            val longitude = location.longitude
-            val timestamp = System.currentTimeMillis()
-            val locationInfo =
-                "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
 
+            if(locationHistory.size!=0){
+                for(loc in locationHistory){
+                    var addres = loc.address
+                    if(! addressText.equals(addres)){
+                        locationHistory.add( Locations(addres))
+                        val latitude = location.latitude
+                        val longitude = location.longitude
+                        val timestamp = System.currentTimeMillis()
+                        val locationInfo =
+                            "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
+                        locationList.add(locationInfo)
+                        adapter.notifyDataSetChanged()
 
-            locationList.add(locationInfo)
-            adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
         } else {
             tvOutput.text = "No address found"
         }

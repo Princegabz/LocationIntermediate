@@ -1,0 +1,79 @@
+Index: app/src/main/java/com/example/locationbasics/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.locationbasics\r\nimport android.Manifest\r\nimport android.content.Context\r\nimport android.content.pm.PackageManager\r\nimport android.graphics.Color\r\nimport android.location.Geocoder\r\nimport android.location.Location\r\nimport android.location.LocationListener\r\nimport android.location.LocationManager\r\nimport android.os.Bundle\r\nimport android.widget.Button\r\nimport android.widget.ListView\r\nimport android.widget.ArrayAdapter\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport androidx.core.app.ActivityCompat\r\nimport androidx.core.content.ContextCompat\r\nimport java.util.Locale\r\n\r\nclass MainActivity : AppCompatActivity(), LocationListener {\r\n\r\n    private lateinit var locationManager: LocationManager\r\n    private lateinit var tvOutput: TextView\r\n    private lateinit var listView: ListView\r\n    private val locationList = mutableListOf<String>()\r\n    private lateinit var adapter: ArrayAdapter<String>\r\n    private val locationPermissionCode = 2\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_main)\r\n        val button: Button = findViewById(R.id.btnLocations)\r\n        button.setBackgroundColor(Color.parseColor(\"#3FC0C8\"))\r\n        tvOutput = findViewById(R.id.lblOutput)\r\n        listView = findViewById(R.id.listView)\r\n\r\n        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, locationList)\r\n        listView.adapter = adapter\r\n\r\n        button.setOnClickListener {\r\n            getLocation()\r\n        }\r\n    }\r\n\r\n    private fun getLocation() {\r\n        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager\r\n        if (ContextCompat.checkSelfPermission(\r\n                this,\r\n                Manifest.permission.ACCESS_FINE_LOCATION\r\n            ) != PackageManager.PERMISSION_GRANTED\r\n        ) {\r\n            ActivityCompat.requestPermissions(\r\n                this,\r\n                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),\r\n                locationPermissionCode\r\n            )\r\n        }\r\n        locationManager.requestLocationUpdates(\r\n            LocationManager.GPS_PROVIDER,\r\n            5000,\r\n            5f,\r\n            this\r\n        )\r\n    }\r\n\r\n    override fun onLocationChanged(location: Location) {\r\n        val geocoder = Geocoder(this, Locale.getDefault())\r\n        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)\r\n\r\n        if (addresses != null && addresses.isNotEmpty()) {\r\n            val address = addresses[0]\r\n            val addressText = address.getAddressLine(0)\r\n            val latitude = location.latitude\r\n            val longitude = location.longitude\r\n            val timestamp = System.currentTimeMillis()\r\n            val locationInfo = \"Latitude: $latitude, Longitude: $longitude, Address: $addressText, Timestamp: $timestamp\"\r\n\r\n            locationList.add(locationInfo)\r\n            adapter.notifyDataSetChanged() // Notify adapter that data has changed\r\n        } else {\r\n            tvOutput.text = \"No address found\"\r\n        }\r\n    }\r\n\r\n\r\n    override fun onRequestPermissionsResult(\r\n        requestCode: Int,\r\n        permissions: Array<out String>,\r\n        grantResults: IntArray\r\n    ) {\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults)\r\n        if(requestCode==locationPermissionCode)\r\n        {\r\n            if(grantResults.isNotEmpty()&&grantResults[0]==PackageManager.PERMISSION_GRANTED)\r\n            {\r\n                Toast.makeText(this,\"Permission Granted\",Toast.LENGTH_SHORT).show()\r\n            }\r\n            else\r\n            {\r\n                Toast.makeText(this,\"Permission Denied\",Toast.LENGTH_SHORT).show()\r\n            }\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/locationbasics/MainActivity.kt b/app/src/main/java/com/example/locationbasics/MainActivity.kt
+--- a/app/src/main/java/com/example/locationbasics/MainActivity.kt	
++++ b/app/src/main/java/com/example/locationbasics/MainActivity.kt	
+@@ -20,10 +20,13 @@
+ 
+ class MainActivity : AppCompatActivity(), LocationListener {
+ 
++
+     private lateinit var locationManager: LocationManager
+     private lateinit var tvOutput: TextView
+     private lateinit var listView: ListView
+     private val locationList = mutableListOf<String>()
++    private val locationHistory = mutableListOf<Locations>()
++
+     private lateinit var adapter: ArrayAdapter<String>
+     private val locationPermissionCode = 2
+ 
+@@ -65,19 +68,31 @@
+     }
+ 
+     override fun onLocationChanged(location: Location) {
++        var currentLat: Double = 0.0
++        var currentLon: Double = 0.0
++
+         val geocoder = Geocoder(this, Locale.getDefault())
+         val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+ 
++
+         if (addresses != null && addresses.isNotEmpty()) {
+             val address = addresses[0]
+             val addressText = address.getAddressLine(0)
+-            val latitude = location.latitude
+-            val longitude = location.longitude
+-            val timestamp = System.currentTimeMillis()
+-            val locationInfo = "Latitude: $latitude, Longitude: $longitude, Address: $addressText, Timestamp: $timestamp"
+-
+-            locationList.add(locationInfo)
+-            adapter.notifyDataSetChanged() // Notify adapter that data has changed
++            if(!(currentLat==location.latitude && currentLon== location.longitude)){
++                val latitude = location.latitude
++                val longitude = location.longitude
++                val timestamp = System.currentTimeMillis()
++                val locationInfo = "Latitude: $latitude,\n Longitude: $longitude, Address: $addressText, Timestamp: $timestamp"
++                locationList.add(locationInfo)
++                adapter.notifyDataSetChanged()
++            }
++            else{
++                Toast.makeText(this, "Already In List", Toast.LENGTH_SHORT).show()
++            }
++
++
++
++ // Notify adapter that data has changed
+         } else {
+             tvOutput.text = "No address found"
+         }
+Index: app/src/main/java/com/example/locationbasics/Locations.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/locationbasics/Locations.kt b/app/src/main/java/com/example/locationbasics/Locations.kt
+new file mode 100644
+--- /dev/null	
++++ b/app/src/main/java/com/example/locationbasics/Locations.kt	
+@@ -0,0 +1,6 @@
++package com.example.locationbasics
++
++data class Locations(
++    var longditude: Double,
++    var latitude: Double
++)
