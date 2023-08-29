@@ -74,22 +74,27 @@ class MainActivity : AppCompatActivity(), LocationListener {
             val address = addresses[0]
             val addressText = address.getAddressLine(0)
 
-            if(locationHistory.size!=0){
+                var i:Int=0
                 for(loc in locationHistory){
                     var addres = loc.address
-                    if(! addressText.equals(addres)){
-                        locationHistory.add( Locations(addres))
-                        val latitude = location.latitude
-                        val longitude = location.longitude
-                        val timestamp = System.currentTimeMillis()
-                        val locationInfo =
-                            "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
-                        locationList.add(locationInfo)
-                        adapter.notifyDataSetChanged()
-
+                    if( addressText.equals(addres)){
+                        i+=1
+                        break
                     }
+
                 }
-            }
+                if(i==0){
+                    locationHistory.add( Locations(addressText))
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    val timestamp = System.currentTimeMillis()
+                    val locationInfo =
+                        "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
+                    locationList.add(locationInfo)
+                    adapter.notifyDataSetChanged()
+                }
+
+
 
         } else {
             tvOutput.text = "No address found"
