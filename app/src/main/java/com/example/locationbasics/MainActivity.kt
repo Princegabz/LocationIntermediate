@@ -74,15 +74,28 @@ class MainActivity : AppCompatActivity(), LocationListener {
             val latitude = location.latitude
             val longitude = location.longitude
             val timestamp = System.currentTimeMillis()
-            val locationInfo = "Latitude: $latitude, Longitude: $longitude, Address: $addressText, Timestamp: $timestamp"
+            val locationInfo =
+                "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
+
 
             locationList.add(locationInfo)
-            adapter.notifyDataSetChanged() // Notify adapter that data has changed
+            adapter.notifyDataSetChanged()
         } else {
             tvOutput.text = "No address found"
         }
     }
 
+    override fun onProviderEnabled(provider: String) {
+        // Implementation for onProviderEnabled if needed
+    }
+
+    override fun onProviderDisabled(provider: String) {
+        // Implementation for onProviderDisabled if needed
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        // Implementation for onStatusChanged
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -90,15 +103,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode==locationPermissionCode)
-        {
-            if(grantResults.isNotEmpty()&&grantResults[0]==PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show()
-            }
-            else
-            {
-                Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show()
+        if (requestCode == locationPermissionCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
