@@ -17,7 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.Locale
+/*
+References -  current timestamp  30 August 2023-
+https://www.baeldung.com/kotlin/current-date-time#:~:text=We%20used%20the%20now(),to%20get%20the%20current%20timestamp.&text=We%20must%20note%20that%20we,to%20initialize%20the%20currentZonedDateTime%20variable.
 
+ */
 class MainActivity : AppCompatActivity(), LocationListener {
 
     private lateinit var locationManager: LocationManager
@@ -73,7 +77,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         if (addresses != null && addresses.isNotEmpty()) {
             val address = addresses[0]
             val addressText = address.getAddressLine(0)
-
+            ///making sure only new locations gets added
                 var i:Int=0
                 for(loc in locationHistory){
                     var addres = loc.address
@@ -81,13 +85,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
                         i+=1
                         break
                     }
-
                 }
                 if(i==0){
                     locationHistory.add( Locations(addressText))
                     val latitude = location.latitude
                     val longitude = location.longitude
-                    val timestamp = System.currentTimeMillis()
+                    val timestamp : java.time.LocalDateTime = java.time.LocalDateTime.now()
                     val locationInfo =
                         "Latitude: $latitude\nLongitude: $longitude\nAddress: $addressText\nTimestamp: $timestamp"
                     locationList.add(locationInfo)
